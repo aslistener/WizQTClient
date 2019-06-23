@@ -62,6 +62,7 @@ set(wiznote_SOURCES
     share/WizWin32Helper.cpp
     share/WizDrawTextHelper.cpp
     share/WizUIHelper.cpp
+    share/WizUIBase.cpp
     share/WizCommonUI.cpp
     share/WizAnimateAction.cpp
     share/WizPopupWidget.cpp
@@ -193,6 +194,8 @@ set(wiznote_SOURCES
     main.cpp
     WizInitBizCertDialog.cpp
     share/WizDocumentStyle.cpp
+
+    WizPlugins.cpp
 )
 
 set(wiznote_HEADERS
@@ -213,6 +216,7 @@ set(wiznote_HEADERS
     share/WizWin32Helper.h
     share/WizDrawTextHelper.h
     share/WizUIHelper.h
+    share/WizUIBase.h
     share/WizCommonUI.h
     share/WizAnimateAction.h
     share/WizPopupWidget.h
@@ -356,6 +360,8 @@ set(wiznote_HEADERS
     WizInitBizCertDialog.h
     share/WizDocumentStyle.h
     WizCombineNotesDialog.h
+
+    WizPlugins.h
 )
 
 set(wiznote_FORMS
@@ -430,8 +436,10 @@ if(UNIX)
         find_library(_COCOA_LIBRARY Cocoa)
         find_library(_WEBENGINE_LIBRARY WebEngine)
         find_library(_WEBENGINEWIDGETS_LIBRARY WebEngineWidgets)
+        find_library(_WEBCHANNEL_LIBRARY WebChannel)
         find_library(_STORE_LIBRARY StoreKit)
         find_library(_IO_LIBRARY IOKit)
+        find_package(Qt5Svg)
         if (PLCrashReporter)
             find_library(_CRASHREPORTER CrashReporter)
         endif(PLCrashReporter)
@@ -459,6 +467,7 @@ if(UNIX)
         add_executable(WizNote ${wiznote_SOURCES} ${wiznote_HEADERS} ${wiznote_FORM_HEADERS} ${wiznote_QM} ${wiznote_RC})
         set_target_properties(${PROJECT_NAME} PROPERTIES AUTOMOC_MOC_OPTIONS "-DQ_OS_LINUX")
         set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "-static-libstdc++ -static-libgcc")
+        find_package(Qt5Svg)
 
         install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
         install(DIRECTORY ${CMAKE_SOURCE_DIR}/share/ DESTINATION share/wiznote PATTERN ".DS_Store" EXCLUDE)
@@ -530,7 +539,9 @@ if(UNIX)
 			target_link_libraries(${PROJECT_NAME}
 				quazip
 				cryptlib
+                Qt5::Svg
 				Qt5::WebEngine
+                Qt5::WebChannel
 				Qt5::WebEngineWidgets
 				${CMAKE_SOURCE_DIR}/lib/openssl/lib/libcrypto.a
 				${CMAKE_SOURCE_DIR}/lib/openssl/lib/libssl.a
@@ -540,7 +551,9 @@ if(UNIX)
 			target_link_libraries(${PROJECT_NAME}
 				quazip
 				cryptlib
-				Qt5::WebEngine
+                Qt5::Svg
+                Qt5::WebEngine
+                Qt5::WebChannel
 				Qt5::WebEngineWidgets
 				${CMAKE_SOURCE_DIR}/lib/openssl/lib/libcrypto.a
 				${CMAKE_SOURCE_DIR}/lib/openssl/lib/libssl.a
@@ -553,7 +566,9 @@ if(UNIX)
                         X11
 			quazip
 			cryptlib
-			Qt5::WebEngine
+            Qt5::Svg
+            Qt5::WebEngine
+            Qt5::WebChannel
 			Qt5::WebEngineWidgets
 			${CMAKE_DL_LIBS}
 		)
@@ -562,7 +577,9 @@ else(NOT UNIX)
 	target_link_libraries(${PROJECT_NAME}
 		quazip
 		cryptlib
-		Qt5::WebEngine
+        Qt5::Svg
+        Qt5::WebEngine
+        Qt5::WebChannel
 		Qt5::WebEngineWidgets
 		${CMAKE_DL_LIBS}
                 Qt5::WinMain

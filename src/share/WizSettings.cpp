@@ -1,5 +1,6 @@
 ﻿#include "WizSettings.h"
 #include "utils/WizPathResolve.h"
+#include "WizUIBase.h"
 
 #include "WizDef.h"
 #include <QLocale>
@@ -153,22 +154,40 @@ void WizSettings::setProxyStatus(bool val)
 }
 
 
+#ifndef Q_OS_MAC
+
+bool WizSettings::isDarkMode()
+{
+    return getBool("Common", "DarkMode", false);
+}
+
+void WizSettings::setDarkMode(bool b)
+{
+    setBool("Common", "DarkMode", b);
+}
+
+#endif
+
+
 CString WizGetShortcut(const CString& strName, const CString& strDef /*= ""*/)
 {
     WizSettings settings(Utils::WizPathResolve::globalSettingsFile());
     return settings.getString("Shortcut", strName, strDef);
 }
 
+WizUserSettings* WizUserSettings::s_currentSettings = nullptr;
 
 WizUserSettings::WizUserSettings(const QString& strAccountFolderName)
     : m_strAccountFolderName(strAccountFolderName)
     , m_db(NULL)
 {
+    s_currentSettings = this;
 }
 
 WizUserSettings::WizUserSettings(WizDatabase& db)
     : m_db(&db)
 {
+    s_currentSettings = this;
 }
 
 void WizUserSettings::setAccountFolderName(const QString& strAccountFolderName)
@@ -390,6 +409,7 @@ bool WizUserSettings::showSystemTrayIcon() const
     return true;
 }
 
+
 void WizUserSettings::setShowSystemTrayIcon(bool bShowTrayIcon)
 {
     set("ShowSystemTrayIcon", bShowTrayIcon ? "1" : "0");
@@ -537,6 +557,11 @@ void WizUserSettings::setRememberNotePasswordForSession(bool remember)
 QString WizUserSettings::editorBackgroundColor()
 {
     QString strColor = get("EditorBackgroundColor");    
+    //
+    if (strColor == WizColorLineEditorBackground.name()) {
+        return "";
+    }
+    //
     return strColor;
 }
 

@@ -22,6 +22,7 @@ class QLabel;
 class QSystemTrayIcon;
 class QComboBox;
 class QActionGroup;
+class QStackedWidget;
 struct TemplateData;
 
 class WizProgressDialog;
@@ -37,6 +38,7 @@ class WizAnimateAction;
 class WizOptionsWidget;
 class WizIAPDialog;
 class WizTemplatePurchaseDialog;
+class WizWebEngineView;
 
 class WizSearchView;
 class WizSearcher;
@@ -127,18 +129,14 @@ protected:
     void moveEvent(QMoveEvent* ev);
     void keyPressEvent(QKeyEvent* ev);
 
-#ifdef Q_OS_MAC
-    virtual void paintEvent(QPaintEvent* event);
-#endif
-
 #ifdef USECOCOATOOLBAR
     virtual void showEvent(QShowEvent *event);
 #endif
 
 private:
     WizDatabaseManager& m_dbMgr;
-    WizProgressDialog* m_progress;
     WizUserSettings* m_settings;
+    WizProgressDialog* m_progress;
     WizKMSyncThread* m_syncFull;
     WizKMSyncThread* m_syncQuick;
     WizUserVerifyDialog* m_userVerifyDialog;
@@ -192,7 +190,10 @@ private:
 
     WizDocumentSelectionView* m_documentSelection;
     WizDocumentView* m_doc;
-    std::shared_ptr<WizSplitter> m_splitter;
+    WizSplitter* m_splitter;
+    WizSplitter* m_subSplitter;
+    QStackedWidget* m_subContainer;
+    WizWebEngineView* m_mainWebView;
     QWidget* m_docListContainer;
     WizSingleDocumentViewDelegate* m_singleViewDelegate;
 
@@ -269,6 +270,11 @@ public:
     void createNoteWithText(const QString& strText);
 
     void createNoteByTemplateCore(const TemplateData& tmplData);
+    //
+    void refreshAd();
+    //
+    void showTrash();
+    void showSharedNotes(); 
 signals:
     void documentsViewTypeChanged(int);
     void documentsSortTypeChanged(int);
@@ -474,6 +480,10 @@ public:
 
     QObject* DatabaseManager();
     Q_PROPERTY(QObject* DatabaseManager READ DatabaseManager)
+
+    QObject* CurrentDocumentBrowserObject();
+    Q_PROPERTY(QObject* CurrentDocumentBrowserObject READ CurrentDocumentBrowserObject)
+
 
     Q_INVOKABLE QObject* CreateWizObject(const QString& strObjectID);
     Q_INVOKABLE void SetSavingDocument(bool saving);
